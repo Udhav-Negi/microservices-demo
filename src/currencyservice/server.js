@@ -195,4 +195,8 @@ function main () {
    );
 }
 
-main();
+if(require.name == module) {
+  main();
+}
+
+module.exports = {_carry}
