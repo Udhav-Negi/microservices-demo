@@ -1,0 +1,98 @@
+name: Build-and-Push-Image
+on:
+  push:
+    branches:
+      - prod
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs: 
+      services: ${{ steps.set-services.outputs.services }}
+
+    steps:
+      - name: Checkout the code 
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect the changes 
+        uses: dorny/paths-filter@v4
+        id: changes
+        with:
+          filters: |
+            adservice:
+              - 'src/adservice/**'
+            cartservice:
+              - 'src/cartservice/**'
+            checkoutservice:
+              - 'src/checkoutservice/**'
+            currencyservice:
+              - 'src/currencyservice/**'
+            emailservice:
+              - 'src/emailservice/**'
+            frontend:
+              - 'src/frontend/**'
+            paymentservice:
+              - 'src/paymentservice/**'
+            productcatalogservice:
+              - 'src/productcatalogservice/**'
+            recommendationservice:
+              - 'src/recommendationservice/**'
+            shippingservice:
+              - 'src/shippingservice/**'
+            shoppingassistantservice:
+              - 'src/shoppingassistantservice/**'
+
+      - name: Determine services to build
+        id: set-services
+        run: |
+          DETECTED=${{steps.changes.outputs.changes}}
+          ALL='["adservice","cartservice","checkoutservice","currencyservice","emailservice","frontend","paymentservice","productcatalogservice","recommendationservice","shippingservice","shoppingassistantservice"]'
+
+          if [ $DETECTED = '[]' ]; then
+            echo "All services needs to be built"
+            echo "services=$ALL">>$GITHUB_OUTPUT
+          else
+            echo "Services to built $DETECTED"
+            echo "services=$DETECTED">>$GITHUB_OUTPUT
+          fi
+
+
+  build-and-push:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJson(needs.detect-changes.outputs.services) }}
+
+    steps: 
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service }}
+          tags: |
+            type=sha,format=short,prefix=sha-
+            type=raw,value=latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src/${{ matrix.service }}
+          file: ${{ matrix.service == 'cartservice' && './src/cartservice/src/Dockerfile' || format('./src/{0}/Dockerfile', matrix.service) }}
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
