@@ -90,7 +90,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.service == 'cartservice' && './src/cartservice/src' || format('./src/${0}') }}
+          context: ${{ matrix.service == 'cartservice' && './src/cartservice/src' || format('./src/${0}', matrix.service) }}
           file: ${{ matrix.service == 'cartservice' && './src/cartservice/src/Dockerfile' || format('./src/{0}/Dockerfile', matrix.service) }}
           platforms: linux/amd64
           push: true
