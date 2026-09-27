@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-process.env.PORT = 7000;
-process.env.DISABLE_PROFILER = 1;
 
 const pino = require('pino');
 const logger = pino({
