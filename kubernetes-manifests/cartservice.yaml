@@ -43,7 +43,9 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: cartservice
+        # image: cartservice
+        image: udhavnegi/cartservice:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 7070
         env:

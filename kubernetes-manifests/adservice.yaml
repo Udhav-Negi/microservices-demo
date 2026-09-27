@@ -43,7 +43,10 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: adservice
+
+        # image: adservice
+        image: udhavnegi/adservice:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 9555
         env:

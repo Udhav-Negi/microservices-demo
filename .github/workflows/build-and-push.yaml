@@ -46,7 +46,7 @@ jobs:
       - name: Determine services to build
         id: set-services
         run: |
-          DETECTED=${{steps.changes.outputs.changes}}
+          DETECTED='${{steps.changes.outputs.changes}}'
           ALL='["adservice","cartservice","checkoutservice","currencyservice","emailservice","frontend","paymentservice","productcatalogservice","recommendationservice","shippingservice","shoppingassistantservice"]'
 
           if [ $DETECTED = '[]' ]; then
