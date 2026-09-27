@@ -43,7 +43,9 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: paymentservice
+        # image: paymentservice
+        image: udhavnegi/paymentservice:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 50051
         env:

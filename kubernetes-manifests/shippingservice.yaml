@@ -42,7 +42,9 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: shippingservice
+        # image: shippingservice
+        image: udhavnegi/shippingservice:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 50051
         env:
