@@ -101,6 +101,8 @@ jobs:
         uses: imranismail/setup-kustomize@v3
 
       - name: Update the manifests
+        env:
+          GH_TOKEN: ${{ secrets.MANIFESTS_PAT }}
         run: |
 
           git clone --depth=1 -b prod https://x-access-token:${{ secrets.MANIFESTS_PAT }}@github.com/Udhav-Negi/manifests-gob.git
@@ -120,6 +122,14 @@ jobs:
             git add kustomization.yaml
             git commit -m "chore(${{  matrix.service }}): bump image to ${{ steps.meta.outputs.version }} [skip ci]"
             git push origin $BRANCH_NAME
+
+            gh pr create \
+              --repo Udhav-Negi/manifests-gob \
+              --base prod \
+              --head "$BRANCH_NAME" \
+              --title "chore(${{ matrix.service }}): deploy${VERSION_TAG} to prod" \
+              --body "Automated promotion for service **${{ matrix.service }}** to tag \`${VERSION_TAG}\` (commit: ${{ github.sha }})."
+
           fi
 
           
