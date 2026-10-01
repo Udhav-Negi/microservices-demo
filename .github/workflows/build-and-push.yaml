@@ -84,7 +84,7 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service }}
           tags: |
-            type=sha,format=short,prefix=sha-
+            type=sha,format=short,prefix=sha-,priority=1000
             type=raw,value=latest
 
       - name: Build and push Docker image
